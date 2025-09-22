@@ -1,6 +1,6 @@
 // /app/api/ai/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai"; // Ensure `openai` is installed: npm i openai
+import OpenAI from "openai";
 
 // POST /api/ai
 export async function POST(req: NextRequest) {

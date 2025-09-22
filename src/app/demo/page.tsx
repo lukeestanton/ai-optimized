@@ -1,8 +1,10 @@
 "use client";
 
-import Header from "./header";
+import Header from "@/components/Header";
 import { useCallback, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import StepCard from "./components/StepCard";
+import BranchPlaceholder from "./components/BranchPlaceholder";
 import {
   Mail,
   Clock,
@@ -43,7 +45,7 @@ type StepRunOptions = {
   bypassGuards?: boolean;
   existingOutputs?: Record<string, string>;
 };
-type BranchPath = "quote_now" | "need_photos" | "needs_human";
+type BranchPath = "buy_now" | "value" | "hesitant" | "disqualify";
 
 type GraphNode = {
   idx: number;
@@ -54,125 +56,60 @@ type GraphNode = {
 };
 
 const GRAPH_SPEC: GraphNode[] = [
-  { idx: 1, stepId: "extract-features", dependsOn: [], stage: "Intake" },
-  { idx: 2, stepId: "decide-path", dependsOn: ["extract-features"], stage: "Routing" },
-  { idx: 3, stepId: "estimate-scope", dependsOn: ["decide-path"], stage: "Scope" },
-  { idx: 4, stepId: "price-job", dependsOn: ["estimate-scope"], stage: "Pricing" },
+  { idx: 1, stepId: "extract-signals", dependsOn: [], stage: "Signal Intake" },
+  { idx: 2, stepId: "decide-path", dependsOn: ["extract-signals"], stage: "Routing" },
+  { idx: 3, stepId: "scope-to-price", dependsOn: ["decide-path"], stage: "Scoping" },
+  { idx: 4, stepId: "build-tiers", dependsOn: ["scope-to-price"], stage: "Offer Design" },
   {
     idx: 5,
-    stepId: "guardrails-present",
-    dependsOn: ["price-job"],
+    stepId: "guardrails-offer",
+    dependsOn: ["build-tiers"],
     stage: "Guardrails",
   },
   {
     idx: 6,
-    stepId: "compose-quote",
-    dependsOn: ["guardrails-present"],
-    stage: "Automations",
-    requiredPath: "quote_now",
+    stepId: "compose-offer-email",
+    dependsOn: ["guardrails-offer"],
+    stage: "Automation",
+    requiredPath: "buy_now",
   },
   {
     idx: 7,
-    stepId: "compose-photo-request",
-    dependsOn: ["guardrails-present"],
-    stage: "Automations",
-    requiredPath: "need_photos",
+    stepId: "compose-value-email",
+    dependsOn: ["guardrails-offer"],
+    stage: "Automation",
+    requiredPath: "value",
   },
   {
     idx: 8,
-    stepId: "compose-human-summary",
-    dependsOn: ["guardrails-present"],
-    stage: "Automations",
-    requiredPath: "needs_human",
+    stepId: "compose-nurture-step",
+    dependsOn: ["guardrails-offer"],
+    stage: "Automation",
+    requiredPath: "hesitant",
+  },
+  {
+    idx: 9,
+    stepId: "compose-referral-note",
+    dependsOn: ["guardrails-offer"],
+    stage: "Automation",
+    requiredPath: "disqualify",
   },
 ];
 
-const STEP_BADGES: Record<string, string[]> = {
-  "extract-features": ["LLM", "Pricebook"],
-  "decide-path": ["LLM", "Routing"],
-  "estimate-scope": ["LLM", "Heuristics"],
-  "price-job": ["LLM", "Pricing"],
-  "guardrails-present": ["LLM", "Guardrails"],
-  "compose-quote": ["LLM", "Customer Comms"],
-  "compose-photo-request": ["LLM", "Photo Workflow"],
-  "compose-human-summary": ["LLM", "Human Handoff"],
-};
-
-const STEP_CONSTRAINTS: Record<string, string[]> = {
-  "extract-features": [
-    "Parse the messy inquiry into normalized JSON",
-    "Capture who, what, quantities, and deadlines",
-    "Be resilient to typos or missing details",
-    "Flag ambiguous addresses and missing fields",
-  ],
-  "decide-path": [
-    "Choose quote_now, need_photos, or needs_human",
-    "Return rationale and messaging pillars",
-    "Prefer human review for risky or unclear jobs",
-    "Route to photo request when surfaces lack clarity",
-  ],
-  "estimate-scope": [
-    "Estimate square footage and crew hours with heuristics",
-    "Round sqft to the nearest 10 and hours to 0.1",
-    "Document assumptions for missing information",
-    "Boost labor for heavy stains or special handling",
-  ],
-  "price-job": [
-    "Build Good/Better/Best pricing tiers",
-    "Calculate internal labor, chemical, travel, misc",
-    "Expose margin percentage for each tier",
-    "Add value bullets to support upsells",
-  ],
-  "guardrails-present": [
-    "Enforce the minimum margin guardrail",
-    "Select the CTA that matches the decision path",
-    "Hide tiers that violate guardrails",
-    "Suggest adjustments when a tier misses targets",
-  ],
-  "compose-quote": [
-    "Create a friendly Markdown quote",
-    "Respect the tier ordering from guardrails",
-    "Close with an on-brand booking CTA",
-    "Keep the copy brief and actionable",
-  ],
-  "compose-photo-request": [
-    "Request 2–3 specific confirmation photos",
-    "Explain why images unblock accurate pricing",
-    "Match tone to the original inquiry",
-    "Close with clear next-step instructions",
-  ],
-  "compose-human-summary": [
-    "Summarize risks for the human reviewer",
-    "Suggest what to verify before quoting",
-    "Provide a quick outreach script",
-    "Keep the note under 120 words",
-  ],
-};
-
-const STATUS_LABELS: Record<RunState, string> = {
-  idle: "Ready",
-  running: "Running",
-  done: "Complete",
-  error: "Needs attention",
-};
-
-const STATUS_STYLES: Record<RunState, string> = {
-  idle: "bg-slate-100 text-slate-600",
-  running: "bg-blue-50 text-blue-600",
-  done: "bg-emerald-50 text-emerald-600",
-  error: "bg-rose-50 text-rose-600",
-};
+// STATUS_LABELS and STATUS_STYLES moved into StepCard component
 
 const PATH_LABELS: Record<BranchPath, string> = {
-  quote_now: "Instant quote",
-  need_photos: "Request photos",
-  needs_human: "Human review",
+  buy_now: "Buy-now recovery",
+  value: "Value reassurance",
+  hesitant: "Hesitant nurture",
+  disqualify: "Decline & referral",
 };
 
 const CTA_LABELS: Record<string, string> = {
-  book_now: "Book now",
-  send_photos: "Request photos",
-  needs_review: "Manual review",
+  book_first_mow: "Book first mow",
+  schedule_walkthrough: "Schedule walkthrough",
+  start_nurture: "Start nurture cadence",
+  send_referral: "Send referral",
 };
 
 type GuardrailsDecision = {
@@ -180,222 +117,11 @@ type GuardrailsDecision = {
   pathEcho?: BranchPath;
   cta?: string;
   hiddenTiers?: string[];
-  adjustments?: Array<{ tier?: string }>;
+  incentives?: string[];
+  adjustments?: Array<{ tier?: string; action?: string; note?: string; amount?: number | null }>;
 };
 
-type StepCardProps = {
-  node: GraphNode;
-  config?: WorkflowStepDefinition;
-  status?: RunState;
-  output?: string;
-  error?: string;
-  peekOpen: boolean;
-  onTogglePeek: (stepId: string) => void;
-  onRunStep: (stepId: string) => Promise<StepRunResult>;
-  canRun: boolean;
-  badges: string[];
-  constraints: string[];
-  isLast: boolean;
-  lockedReason?: string;
-  isNext: boolean;
-  displayIndex: string;
-};
-
-function StepCard({
-  node,
-  config,
-  status,
-  output,
-  error,
-  peekOpen,
-  onTogglePeek,
-  onRunStep,
-  canRun,
-  badges,
-  constraints,
-  isLast,
-  lockedReason,
-  isNext,
-  displayIndex,
-}: StepCardProps) {
-  const safeStatus: RunState = status ?? "idle";
-  const highlight = isNext && safeStatus !== "done" && safeStatus !== "running";
-
-  return (
-    <div className="relative pl-10">
-      {!isLast && (
-        <span className="absolute left-[18px] top-10 bottom-0 w-px bg-slate-200" aria-hidden="true" />
-      )}
-      <span
-        className={`absolute left-0 top-6 flex h-9 w-9 items-center justify-center rounded-full border-2 bg-white text-sm font-semibold ${
-          safeStatus === "done"
-            ? "border-emerald-400 text-emerald-600"
-            : safeStatus === "running"
-            ? "border-blue-400 text-blue-600"
-            : safeStatus === "error"
-            ? "border-rose-300 text-rose-600"
-            : "border-slate-200 text-slate-500"
-        }`}
-        aria-hidden="true"
-      >
-        {displayIndex}
-      </span>
-
-      <div
-        className={`flex-1 rounded-2xl border bg-white shadow-sm transition-shadow ${
-          highlight ? "border-blue-300 shadow-md ring-1 ring-blue-100" : "border-slate-200"
-        }`}
-      >
-        <div className="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-start lg:justify-between">
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-slate-500">
-              {node.stage}
-            </p>
-            <h3 className="text-lg font-semibold text-slate-900">
-              {config?.title ?? `Step ${displayIndex}`}
-            </h3>
-            {config?.description && (
-              <p className="text-sm leading-relaxed text-slate-500">{config.description}</p>
-            )}
-            {node.requiredPath && (
-              <p className="text-xs text-slate-500">
-                Active when path = {" "}
-                <span className="font-medium text-slate-700">{PATH_LABELS[node.requiredPath]}</span>
-              </p>
-            )}
-            {lockedReason && safeStatus !== "done" && safeStatus !== "running" && (
-              <p className="text-xs text-amber-600">{lockedReason}</p>
-            )}
-          </div>
-          <div className="flex flex-col items-start gap-3 lg:items-end">
-            {badges.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {badges.map((badge) => (
-                  <span
-                    key={badge}
-                    className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-slate-600"
-                  >
-                    {badge}
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className="flex flex-wrap items-center gap-3">
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                  STATUS_STYLES[safeStatus]
-                }`}
-              >
-                {STATUS_LABELS[safeStatus]}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  void onRunStep(node.stepId);
-                }}
-                disabled={
-                  safeStatus === "running" || safeStatus === "done" || !canRun
-                }
-                className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
-              >
-                <Play className="h-4 w-4" />
-                {safeStatus === "running"
-                  ? "Running…"
-                  : safeStatus === "done"
-                  ? "Completed"
-                  : canRun
-                  ? "Run with AI"
-                  : "Locked"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-5">
-          <button
-            type="button"
-            onClick={() => onTogglePeek(node.stepId)}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-slate-900"
-            aria-expanded={peekOpen}
-          >
-            <ChevronDown
-              className={`h-4 w-4 transition-transform ${peekOpen ? "rotate-180" : ""}`}
-            />
-            View run log
-          </button>
-
-          {peekOpen && (
-            <div className="mt-4 grid gap-6 lg:grid-cols-2">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-500">
-                  Guardrails
-                </p>
-                <ul className="mt-2 space-y-1 text-sm text-slate-600">
-                  {constraints.map((item) => (
-                    <li key={item} className="leading-relaxed">
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-500">
-                  Output
-                </p>
-                <div className="mt-2 text-sm text-slate-600">
-                  {safeStatus === "error" ? (
-                    <div className="rounded-2xl border border-rose-100 bg-rose-50 px-3 py-2 text-rose-700">
-                      {error || "Step failed."}
-                    </div>
-                  ) : safeStatus === "running" ? (
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600">
-                      Running AI step…
-                    </div>
-                  ) : output ? (
-                    <div className="prose prose-sm max-w-none rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-slate-900">
-                      <ReactMarkdown>{output}</ReactMarkdown>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-500">
-                      No output yet. Run the step to preview the transcript.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BranchPlaceholder({ guardrailsCompleted }: { guardrailsCompleted: boolean }) {
-  return (
-    <div className="relative pl-10">
-      <span className="absolute left-[18px] top-10 bottom-0 w-px bg-slate-200" aria-hidden="true" />
-      <span
-        className={`absolute left-0 top-6 flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed bg-white text-xs font-semibold ${
-          guardrailsCompleted ? "border-blue-300 text-blue-500" : "border-slate-300 text-slate-400"
-        }`}
-        aria-hidden="true"
-      >
-        6
-      </span>
-      <div
-        className={`rounded-2xl border border-dashed px-5 py-4 text-sm leading-relaxed ${
-          guardrailsCompleted
-            ? "border-blue-200 bg-blue-50 text-blue-700"
-            : "border-slate-200 bg-slate-50 text-slate-500"
-        }`}
-      >
-        {guardrailsCompleted
-          ? "Guardrails picked a path. Trigger the automation to ship the final output."
-          : "Guardrails will route this inquiry to an instant quote, a photo request, or a human review summary."}
-      </div>
-    </div>
-  );
-}
+// StepCard and BranchPlaceholder moved to ./components
 
 export default function QuoteToOrderAutopilotDemo() {
   const workflow = inquiryToQuoteWorkflow;
@@ -410,7 +136,7 @@ export default function QuoteToOrderAutopilotDemo() {
   const [intakeOpen, setIntakeOpen] = useState(true);
 
   const [customerMessage, setCustomerMessage] = useState<string>(
-    "I spilled 200 gallons of expired barbecue sauce across my driveway during a tailgate experiment gone wrong. Can you blast it clean by this Friday? The raccoons won't leave."
+    "Hey there — this is Marcus from 18 Cedar Brook. You sent over a mowing plan in April but we never booked. The lawn is looking rough again, the backyard slope is overgrown, and we'd like it sorted before the neighborhood block party in two weeks. Another company dangled $65/week if we lock in bi-weekly service. Could you match that or give us a reason to stay with you?"
   );
 
   const [stepStatus, setStepStatus] = useState<Record<string, RunState>>({});
@@ -496,7 +222,7 @@ export default function QuoteToOrderAutopilotDemo() {
         }
       }
 
-      setPeekOpen((prev) => ({ ...prev, [stepId]: true }));
+      // Do not auto-open or auto-close run logs on step start
       setStepStatus((prev) => ({ ...prev, [stepId]: "running" }));
       setStepError((prev) => ({ ...prev, [stepId]: "" }));
 
@@ -663,36 +389,20 @@ export default function QuoteToOrderAutopilotDemo() {
       <Header />
       <main className="mx-auto max-w-6xl space-y-10 px-4 pb-16 pt-10">
         <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <div className="bg-gradient-to-r from-slate-900 to-slate-700 px-6 py-6 text-white">
+          <div className="bg-gradient-to-r from-blue-500 to-orange-500 px-6 py-6 text-white">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-300">
-                  Live orchestration
+                  Revenue rescuer
                 </p>
                 <h1 className="text-2xl font-semibold">
-                  Inquiry-to-Quote Autopilot
+                  Lawn Care Revival Playbook
                 </h1>
-                <p className="text-sm text-slate-300">
-                  Follow each automation stage just like the Zapier platform—edit the
-                  intake, run steps, and inspect guardrails before the final handoff.
+                <p className="text-sm text-white">
+                  Watch the workflow revive a price-sensitive mowing lead—consume the signals, lock pricing, and ship a polished follow-up from one console.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={runAllSteps}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition hover:bg-white/20"
-                >
-                  <Play className="h-4 w-4" /> Run entire demo
-                </button>
-                <button
-                  type="button"
-                  onClick={resetRun}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
-                >
-                  <RotateCcw className="h-4 w-4" /> Reset state
-                </button>
-              </div>
+            {/* Buttons removed per request; controls remain in the timeline section below */}
             </div>
           </div>
           <div className="grid gap-4 px-6 py-6 sm:grid-cols-3">
@@ -720,7 +430,7 @@ export default function QuoteToOrderAutopilotDemo() {
                   {selectedPath ? PATH_LABELS[selectedPath] : "Pending guardrails"}
                 </p>
                 <p className="text-xs text-slate-500">
-                  Guardrails choose the automation after pricing completes.
+                  Guardrails select the revival motion once the offer aligns with targets.
                 </p>
               </div>
             </div>
@@ -769,7 +479,7 @@ export default function QuoteToOrderAutopilotDemo() {
                     <Clock className="h-3.5 w-3.5" /> SLA 2h
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">
-                    <Tag className="h-3.5 w-3.5" /> Powerwash
+                    <Tag className="h-3.5 w-3.5" /> Lawn care
                   </span>
                 </div>
 
@@ -899,8 +609,6 @@ export default function QuoteToOrderAutopilotDemo() {
                   onTogglePeek={togglePeek}
                   onRunStep={runStep}
                   canRun={readiness[node.stepId]}
-                  badges={STEP_BADGES[node.stepId] ?? []}
-                  constraints={STEP_CONSTRAINTS[node.stepId] ?? []}
                   isLast={false}
                   lockedReason={getLockedReason(node)}
                   isNext={nextStep?.stepId === node.stepId}
@@ -909,23 +617,21 @@ export default function QuoteToOrderAutopilotDemo() {
               ))}
 
               {activeBranchNode ? (
-                <StepCard
-                  node={activeBranchNode}
-                  config={stepConfigs[activeBranchNode.stepId]}
-                  status={activeBranchStatus}
-                  output={activeBranchOutput}
-                  error={activeBranchError}
-                  peekOpen={!!peekOpen[activeBranchNode.stepId]}
-                  onTogglePeek={togglePeek}
-                  onRunStep={runStep}
-                  canRun={readiness[activeBranchNode.stepId]}
-                  badges={STEP_BADGES[activeBranchNode.stepId] ?? []}
-                  constraints={STEP_CONSTRAINTS[activeBranchNode.stepId] ?? []}
-                  isLast
-                  lockedReason={getLockedReason(activeBranchNode)}
-                  isNext={nextStep?.stepId === activeBranchNode.stepId}
-                  displayIndex="6"
-                />
+              <StepCard
+                node={activeBranchNode}
+                config={stepConfigs[activeBranchNode.stepId]}
+                status={activeBranchStatus}
+                output={activeBranchOutput}
+                error={activeBranchError}
+                peekOpen={!!peekOpen[activeBranchNode.stepId]}
+                onTogglePeek={togglePeek}
+                onRunStep={runStep}
+                canRun={readiness[activeBranchNode.stepId]}
+                isLast
+                lockedReason={getLockedReason(activeBranchNode)}
+                isNext={nextStep?.stepId === activeBranchNode.stepId}
+                displayIndex={`${primaryNodes.length + 1}`}
+              />
               ) : (
                 <BranchPlaceholder guardrailsCompleted={guardrailsCompleted} />
               )}

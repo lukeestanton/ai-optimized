@@ -3,11 +3,6 @@ export type WorkflowPromptContext = {
   previousStepOutput?: string;
 };
 
-export interface WorkflowStepLayoutHints {
-  position: { x: number; y: number };
-  lane?: string;
-}
-
 export interface WorkflowStepDefinition {
   title: string;
   description?: string;
@@ -15,7 +10,9 @@ export interface WorkflowStepDefinition {
   promptTemplate: (input: WorkflowPromptContext) => string;
   dependsOn?: string[];
   requiredPath?: string;
-  layout?: WorkflowStepLayoutHints;
+  badges?: string[];
+  constraints?: string[];
+  gradientClass?: string;
 }
 
 export interface WorkflowBranchDefinition {

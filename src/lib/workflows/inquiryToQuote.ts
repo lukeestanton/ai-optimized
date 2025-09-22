@@ -1,176 +1,203 @@
+// Revenue Rescuer Workflow — Abandoned Lead Revival for Lawn Mowing
 import { WorkflowDefinition } from "./types";
 
-export const MARGIN_FLOOR_PCT = 22;
+export const MARGIN_FLOOR_PCT = 24;
 
 export const inquiryToQuoteWorkflow: WorkflowDefinition = {
-  entryStepId: "extract-features",
-  branchDecisionStepId: "guardrails-present",
+  entryStepId: "extract-signals",
+  branchDecisionStepId: "guardrails-offer",
   stepOrder: [
-    "extract-features",
+    "extract-signals",
     "decide-path",
-    "estimate-scope",
-    "price-job",
-    "guardrails-present",
-    "compose-quote",
-    "compose-photo-request",
-    "compose-human-summary",
+    "scope-to-price",
+    "build-tiers",
+    "guardrails-offer",
+    "compose-offer-email",
+    "compose-value-email",
+    "compose-nurture-step",
+    "compose-referral-note",
   ],
   branches: {
-    quote_now: {
-      label: "Quote Now",
-      resultStepId: "compose-quote",
+    buy_now: {
+      label: "Buy-now recovery",
+      resultStepId: "compose-offer-email",
     },
-    need_photos: {
-      label: "Need Photos",
-      resultStepId: "compose-photo-request",
+    value: {
+      label: "Value reassurance",
+      resultStepId: "compose-value-email",
     },
-    needs_human: {
-      label: "Needs Human Review",
-      resultStepId: "compose-human-summary",
+    hesitant: {
+      label: "Hesitant nurture",
+      resultStepId: "compose-nurture-step",
+    },
+    disqualify: {
+      label: "Decline & referral",
+      resultStepId: "compose-referral-note",
     },
   },
   steps: {
-    "extract-features": {
-      title: "Extract Features",
+    "extract-signals": {
+      title: "Extract Signals",
       description:
-        "Parse the messy inquiry into normalized features for downstream decisions.",
+        "Pull revival-worthy signals from the abandoned lead to prep smart routing.",
       system:
-        "You are a precise intake parser for home-services quotes. Output strict JSON only.",
+        "You are a revenue recovery intake parser for a premium lawn care operator. Output strict JSON only.",
+      badges: ["LLM", "RevOps"],
+      constraints: [
+        "Do not invent details—mark unclear data as null or \"unknown\"",
+        "Capture blockers and timing cues explicitly mentioned",
+        "Surface any hints about prior service levels or expectations",
+        "Stay consistent across leads so downstream pricing is stable",
+      ],
+      gradientClass: "from-emerald-500 via-lime-500 to-green-600",
       promptTemplate: ({ customerMessage }) =>
         [
-          "Inquiry:",
+          "Lead transcript / CRM note:",
           '"""',
           customerMessage,
           '"""',
           "",
-          "Extract conservative features. If unknown, use null/empty—not guesses.",
-          "- If the address is ambiguous or non-specific (e.g., landmark-only like 'white house' without city/zip), set address to null and add 'ambiguous_address' to riskFlags.",
-          "- If the inquiry mentions 'photo', 'photos', 'picture', or 'pictures', include a 'photos_requested' marker in riskFlags (non-risky flag used for routing).",
+          "Extract the recovery signals needed to revive an abandoned lawn mowing lead.",
+          "- Flag blockers like competitor quotes, bad past experience, budget caps, HOA notices, or access issues.",
+          "- Timing should reflect upcoming weather, events, or season stage (e.g., spring kickoff, mid-season).",
           "Return STRICT JSON (no code fences):",
           `{
-  "contact": { "name": string | null, "email": string | null, "phone": string | null },
-  "address": string | null,
-  "surfaces": [ { "type": "driveway|patio|siding|walkway|deck|other", "sqft": number | null, "notes": string[] } ],
-  "stains": string[],             // e.g., ["oil","mildew"]
-  "timeHints": string[],          // e.g., ["Fri PM","Oct 15"]
-  "priceSensitivity": "low" | "medium" | "high" | "unknown",
-  "readiness": "ready" | "shopping" | "hesitant" | "unknown",
-  "riskFlags": string[],          // pets, ladders, height, HOA, out-of-area, ambiguous_address, photos_requested, etc.
-  "channelPref": "email" | "sms" | "phone" | "unknown"
+  "intent": "renewal" | "price_check" | "shopping" | "urgent_fix" | "unknown",
+  "readiness": "hot" | "warm" | "cool" | "unknown",
+  "priceSensitivity": "none" | "moderate" | "high" | "unknown",
+  "blockers": string[],
+  "surfaceHints": string[],
+  "timing": { "requestedWindow": string | null, "seasonStage": string | null },
+  "contextNotes": string[]
 }`,
         ].join("\n"),
-      layout: {
-        position: { x: 50, y: 50 },
-      },
     },
     "decide-path": {
       title: "Decide Path",
       description:
-        "Choose one: quote_now, need_photos, or needs_human, with rationale + pillars.",
+        "Choose the right revival playbook with rationale and messaging pillars.",
       system:
-        "You map features to a sales/ops path. Output strict JSON only.",
+        "You are a lifecycle strategist reviving lawn mowing leads. Output strict JSON only.",
+      badges: ["LLM", "Routing"],
+      constraints: [
+        "Pick exactly one path",
+        "Tie rationale back to extracted signals",
+        "Provide 3-5 messaging pillars anchored in lawn care outcomes",
+        "Prefer disqualify only for non-fit or no-service zones",
+      ],
+      gradientClass: "from-amber-500 via-orange-500 to-amber-600",
       promptTemplate: ({ previousStepOutput = "{}" }) =>
         [
-          "Features JSON:",
+          "Signals JSON:",
           previousStepOutput,
           "",
-          "Rules:",
-          "- needs_human if any of: strong riskFlags (height/ladder/unsafe), unclear address + high risk language, or contradictory scope.",
-          "- need_photos if surfaces/areas are unclear OR stains mentioned without clarity, AND no serious risk.",
-          "- need_photos if the inquiry explicitly requests photos/pictures, provided there is no serious risk requiring needs_human.",
-          "- need_photos if address is ambiguous (e.g., landmark-only) but otherwise low-risk — use photos to disambiguate.",
-          "- quote_now only if surfaces clear enough AND address appears serviceable or not required for scope.",
-          "",
-          "Also pick 3–5 messaging pillars for copy (e.g., longevity, safety for pets/plants, curb appeal, warranty, fast scheduling).",
+          "Path rules:",
+          "- buy_now: lead is urgent/ready, minimal blockers, trust intact. Aim to lock first cut ASAP.",
+          "- value: price-sensitive but savable—requires ROI framing, maybe bundle savings.",
+          "- hesitant: emotional or logistical friction that needs reassurance cadence before pitching price.",
+          "- disqualify: outside territory, red-flag behavior, or economics untenable—hand off gracefully.",
           "Return STRICT JSON:",
           `{
-  "path": "quote_now" | "need_photos" | "needs_human",
+  "path": "buy_now" | "value" | "hesitant" | "disqualify",
   "rationale": string,
-  "pillars": string[]
+  "pillars": [string, string, string]
 }`,
         ].join("\n"),
-      dependsOn: ["extract-features"],
-      layout: {
-        position: { x: 50, y: 300 },
-      },
+      dependsOn: ["extract-signals"],
     },
-    "estimate-scope": {
-      title: "Estimate Scope",
+    "scope-to-price": {
+      title: "Scope to Price",
       description:
-        "Infer missing sqft and crewHours using stable heuristics so pricing is consistent.",
+        "Infer lawn size, cadence, and crew plan with locked heuristics for pricing.",
       system:
-        "You estimate scope conservatively. Output strict JSON only.",
+        "You estimate recurring mowing scope with conservative, repeatable heuristics. Output strict JSON only.",
+      badges: ["LLM", "Heuristics"],
+      constraints: [
+        "Use the same sqft + minutes heuristics every time",
+        "Document assumptions you make for missing info",
+        "Inflate effort for hills, obstacles, or overgrowth",
+        "Never drop below a 45-minute minimum visit",
+      ],
+      gradientClass: "from-sky-500 via-blue-500 to-blue-600",
       promptTemplate: ({ customerMessage, previousStepOutput = "{}" }) =>
         [
-          "Inputs (may be features or decision JSON):",
+          "Decision JSON (path + pillars):",
           previousStepOutput,
           "",
-          "Original inquiry (for hints):",
+          "Lead transcript for additional cues:",
           '"""',
           customerMessage,
           '"""',
           "",
-          "Heuristics for missing sqft:",
-          "- driveway: 480; patio: 240; siding: 2000; walkway: 80.",
-          "- totalSqft = sum; crewHours = (totalSqft/300) + 0.5 setup; min 1.0; +0.5 if stains include oil/rust.",
-          "- Round sqft to nearest 10; crewHours to 1 decimal.",
+          "Heuristics (apply consistently):",
+          "- If footage unknown: town lot 8,500 sqft, suburb 12,000 sqft, estate 22,000 sqft.",
+          "- Minutes per visit = (estimatedSqft / 250) + 15 setup; +20 if overgrown or many obstacles.",
+          "- Crew size defaults to 2. Use 3 if sqft > 18,000 or terrain is sloped/complex.",
+          "- Drive time default 20 minutes round trip unless timing notes suggest onsite crew.",
+          "- Season length defaults 28 weeks; shorten to 20 for late-season, extend to 32 for year-round markets.",
           "Return STRICT JSON:",
           `{
-  "areasBySurface": [{ "surface": "driveway|patio|siding|walkway|deck|other", "sqft": number }],
-  "totalSqft": number,
-  "crewHours": number,
-  "assumptions": string[]
+  "estimatedSqft": number,
+  "visitCadence": "weekly" | "biweekly" | "monthly" | "one_time",
+  "seasonLengthWeeks": number,
+  "minutesPerVisit": number,
+  "crewSize": number,
+  "driveMinutes": number,
+  "terrain": "flat" | "sloped" | "obstructed",
+  "assumptions": string[],
+  "upsellAngles": string[]
 }`,
         ].join("\n"),
       dependsOn: ["decide-path"],
-      layout: {
-        position: { x: 50, y: 550 },
-      },
     },
-    "price-job": {
-      title: "Price Job",
+    "build-tiers": {
+      title: "Tier Builder",
       description:
-        "Create Good/Better/Best, compute internal costs + margins (LLM math).",
+        "Lock Good/Better/Best mowing programs with stable unit economics.",
       system:
-        "You produce itemized tiers with simple internal cost model. Output strict JSON only.",
+        "You produce lawn mowing offers with disciplined margin math. Output strict JSON only.",
+      badges: ["LLM", "Pricing"],
+      constraints: [
+        "Base labor rate: $58 per crew hour (minutesPerVisit * crewSize / 60).",
+        "Fuel+equipment reserve: $9 per visit + $0.004 per sqft.",
+        "Drive cost: $0.55 per drive-minute * crewSize.",
+        "Good: essential mow + trim. Better: add edging, blow-down, light bed touch-up. Best: include fertilization or shrub trim anchor upsell.",
+        "Show per-visit price and season total; keep tier deltas within 18-28%.",
+      ],
+      gradientClass: "from-purple-500 via-indigo-500 to-purple-600",
       promptTemplate: ({ previousStepOutput = "{}" }) =>
         [
           "Scope JSON:",
           previousStepOutput,
           "",
-          "Cost heuristics:",
-          "- labor: $65 * crewHours",
-          "- chem: hard surfaces $0.08/sqft; siding $0.05/sqft",
-          "- travel: $15; misc: $15",
-          "Tier logic:",
-          "- Good: essential clean.",
-          "- Better: + pretreat if stains OR mild upsell.",
-          "- Best: + sealant/warranty style upsell.",
-          "Compute marginPct = (subtotal - (labor+chem+travel+misc)) / subtotal * 100 (1 decimal).",
+          "Compute using the locked heuristics above. SeasonTotal = perVisit * seasonLengthWeeks (or visit count for 'one_time').",
           "Return STRICT JSON:",
           `{
   "tiers": [
     {
       "name": "Good",
+      "perVisit": number,
+      "seasonTotal": number,
       "lineItems": [{ "name": string, "price": number }],
-      "subtotal": number,
-      "estCost": { "labor": number, "chem": number, "travel": number, "misc": number },
+      "estCost": { "labor": number, "fuel": number, "drive": number, "misc": number },
       "marginPct": number,
       "valueBullets": [string, string, string]
     },
     {
       "name": "Better",
+      "perVisit": number,
+      "seasonTotal": number,
       "lineItems": [{ "name": string, "price": number }],
-      "subtotal": number,
-      "estCost": { "labor": number, "chem": number, "travel": number, "misc": number },
+      "estCost": { "labor": number, "fuel": number, "drive": number, "misc": number },
       "marginPct": number,
       "valueBullets": [string, string, string]
     },
     {
       "name": "Best",
+      "perVisit": number,
+      "seasonTotal": number,
       "lineItems": [{ "name": string, "price": number }],
-      "subtotal": number,
-      "estCost": { "labor": number, "chem": number, "travel": number, "misc": number },
+      "estCost": { "labor": number, "fuel": number, "drive": number, "misc": number },
       "marginPct": number,
       "valueBullets": [string, string, string]
     }
@@ -178,132 +205,177 @@ export const inquiryToQuoteWorkflow: WorkflowDefinition = {
   "notes": string[]
 }`,
         ].join("\n"),
-      dependsOn: ["estimate-scope"],
-      layout: {
-        position: { x: 50, y: 800 },
-      },
+      dependsOn: ["scope-to-price"],
     },
-    "guardrails-present": {
-      title: "Guardrails & Presentation",
+    "guardrails-offer": {
+      title: "Guardrails & Offer Strategy",
       description:
-        "Protect margin, order tiers by buyer path, choose CTA, or propose adjustments.",
+        "Protect margin, reorder tiers, add incentives, and pick the right CTA.",
       system:
-        "You enforce guardrails and tailor presentation. Output strict JSON only.",
+        "You enforce guardrails for lawn mowing offers and prep the branch automation. Output strict JSON only.",
+      badges: ["LLM", "Guardrails"],
+      constraints: [
+        `Enforce minimum margin: ${MARGIN_FLOOR_PCT}% or higher per tier`,
+        "Add incentives only when path requires extra nudge",
+        "Map CTA to the branch path (buy_now/value/hesitant/disqualify)",
+        "Hide tiers that break strategy or economics",
+      ],
+      gradientClass: "from-rose-500 via-pink-500 to-rose-600",
       promptTemplate: ({ customerMessage, previousStepOutput = "{}" }) =>
         [
-          "Pricing JSON (merge with earlier decision and inquiry cues in your reasoning):",
+          "Pricing JSON:",
           previousStepOutput,
           "",
-          "Original inquiry (for explicit cues like 'photos' and address hints):",
+          "Lead transcript for tone & urgency cues:",
           '"""',
           customerMessage,
           '"""',
           "",
-          `Rules:
-- Any tier with marginPct < ${MARGIN_FLOOR_PCT} → add a suggested adjustment (increase $ or remove add-on).
-- Path rules:
-  - quote_now → order Best, Better, Good if priceSensitivity != 'high'; otherwise Value order Good, Better, Best.
-  - need_photos → hide Better/Best, CTA 'send_photos'.
-  - needs_human → hide all tiers; CTA 'needs_review'.
-  - Prefer need_photos if the inquiry explicitly requests photos/pictures (keywords: photo, photos, picture, pictures) and there is no serious risk.
-  - Prefer need_photos when address cues are ambiguous/landmark-only and otherwise low-risk.`,
-          "",
+          "Rules:",
+          `- Any tier with marginPct < ${MARGIN_FLOOR_PCT}: recommend price increase or removing an add-on.`,
+          "- Path mapping: buy_now → CTA 'book_first_mow'; value → CTA 'schedule_walkthrough'; hesitant → CTA 'start_nurture'; disqualify → CTA 'send_referral'.",
+          "- Incentives: offer small add-ons (first cut free edging, skip-fee forgiveness) only when it helps close.",
           "Return STRICT JSON:",
           `{
-  "orderedTiers": ["Good","Better","Best"],
+  "orderedTiers": ["Good", "Better", "Best"],
   "hiddenTiers": string[],
-  "cta": "book_now" | "send_photos" | "needs_review",
+  "cta": "book_first_mow" | "schedule_walkthrough" | "start_nurture" | "send_referral",
+  "incentives": string[],
   "adjustments": [
-    { "tier": "Good|Better|Best", "action": "increase_price" | "remove_item", "amount": number, "note": string }
+    { "tier": "Good" | "Better" | "Best", "action": "increase_price" | "remove_item", "amount": number | null, "note": string }
   ],
-  "pathEcho": "quote_now" | "need_photos" | "needs_human"
+  "pathEcho": "buy_now" | "value" | "hesitant" | "disqualify"
 }`,
         ].join("\n"),
-      dependsOn: ["price-job"],
-      layout: {
-        position: { x: 50, y: 1050 },
-      },
+      dependsOn: ["build-tiers"],
     },
-    "compose-quote": {
-      title: "Compose Quote (if quote_now)",
-      description: "Markdown customer quote for shown tiers, short and friendly.",
+    "compose-offer-email": {
+      title: "Compose Offer Email (buy_now)",
+      description: "Write the polished revive email that locks in the first mow now.",
       system:
-        "You write concise, friendly Markdown. Output Markdown only (no fences).",
+        "You are the frontline revenue rescuer. Write a persuasive, on-brand email. Output Markdown only (no fences).",
+      badges: ["LLM", "Customer Comms"],
+      constraints: [
+        "Subject line + body—ready to paste",
+        "Reference ordered tiers and incentives without exposing internal math",
+        "Create an assertive CTA for immediate booking",
+        "Keep under 220 words; sound like a premium lawn care crew",
+      ],
+      gradientClass: "from-green-500 via-teal-500 to-green-600",
       promptTemplate: ({ customerMessage, previousStepOutput = "{}" }) =>
         [
-          "Presentation JSON (with orderedTiers & cta):",
+          "Guardrail decision JSON:",
           previousStepOutput,
           "",
-          "Original inquiry (tone cues):",
+          "Original lead transcript (tone cues):",
           '"""',
           customerMessage,
           '"""',
           "",
-          "Write a short Markdown quote:",
-          "- H2 title with job type (infer) e.g., '## Driveway & Patio Cleaning — Draft Quote'",
-          "- 3–4 value bullets tailored to likely pillars (longevity/safety/scheduling).",
-          "- Itemized tiers shown (in chosen order) with **Subtotal** lines, excluding hidden tiers.",
-          "- Close with a single CTA sentence matched to `cta` ('Reply to hold Mon 2–4pm', etc.).",
+          "Write the Markdown email:",
+          "- Include a compelling subject line (Prefix with 'Subject:').",
+          "- Greet the contact warmly, reference why the crew is following up now.",
+          "- Summarize the recommended tier (top of orderedTiers) with plain-language value pillars.",
+          "- Offer clear CTA aligned with `cta`.",
+          "- Close with a confident sign-off from the crew lead.",
         ].join("\n"),
-      dependsOn: ["guardrails-present"],
-      requiredPath: "quote_now",
-      layout: {
-        position: { x: 350, y: 1250 },
-      },
+      dependsOn: ["guardrails-offer"],
+      requiredPath: "buy_now",
     },
-    "compose-photo-request": {
-      title: "Compose Photo Request (if need_photos)",
-      description: "Markdown guide asking for 2–3 photos to reduce uncertainty.",
+    "compose-value-email": {
+      title: "Compose Offer Email (value)",
+      description: "Reassure on value, frame savings, and prompt a softer conversion.",
       system:
-        "You give clear, friendly instructions. Output Markdown only (no fences).",
+        "You are a lawn care CSM converting value-seeking leads. Output Markdown only (no fences).",
+      badges: ["LLM", "Customer Comms"],
+      constraints: [
+        "Lead with empathy on budget without discounting below guardrails",
+        "Highlight total cost of ownership savings",
+        "Propose the middle tier unless guardrails hide it",
+        "Drive to a consult or walkthrough CTA",
+      ],
+      gradientClass: "from-cyan-500 via-blue-500 to-cyan-600",
       promptTemplate: ({ customerMessage, previousStepOutput = "{}" }) =>
         [
-          "Presentation JSON (pathEcho should be 'need_photos'):",
+          "Guardrail decision JSON:",
           previousStepOutput,
           "",
-          "Use the inquiry to tailor what photos to ask for:",
+          "Lead transcript (for tone):",
           '"""',
           customerMessage,
           '"""',
           "",
-          "Write a concise Markdown note:",
-          "- H3 title 'Quick Photos to Finalize Your Quote'",
-          "- Bulleted list of 3 specific shots (wide area, close-up of stain, access/water spigot).",
-          "- One line about why it helps (accuracy, discounts if area is smaller).",
-          "- Closing line with channel choice (email/SMS).",
+          "Write the Markdown email:",
+          "- Start with 'Subject:' and a trust-building line.",
+          "- Restate lawn goals and stack 2-3 value pillars.",
+          "- Present the suggested tier with per-visit economics (no internal costs).",
+          "- Invite them to the walkthrough CTA with scheduling details.",
+          "- End with a reassuring sign-off and reply instructions.",
         ].join("\n"),
-      dependsOn: ["guardrails-present"],
-      requiredPath: "need_photos",
-      layout: {
-        position: { x: 50, y: 1250 },
-      },
+      dependsOn: ["guardrails-offer"],
+      requiredPath: "value",
     },
-    "compose-human-summary": {
-      title: "Compose Human Review Summary (if needs_human)",
-      description:
-        "Markdown summary for internal reviewer: risks/ambiguities and a suggested next step.",
+    "compose-nurture-step": {
+      title: "Compose Nurture Touch (hesitant)",
+      description: "Draft the drip step that rebuilds trust before reselling.",
       system:
-        "You produce a crisp internal note. Output Markdown only (no fences).",
+        "You design short nurture copy for hesitant lawn leads. Output Markdown only (no fences).",
+      badges: ["LLM", "Lifecycle"],
+      constraints: [
+        "Two short paragraphs max",
+        "Acknowledge blocker, offer social proof, set gentle follow-up CTA",
+        "Close with when the next touch will occur",
+      ],
+      gradientClass: "from-yellow-500 via-amber-500 to-yellow-600",
       promptTemplate: ({ customerMessage, previousStepOutput = "{}" }) =>
         [
-          "Presentation JSON (pathEcho should be 'needs_human'):",
+          "Guardrail decision JSON:",
           previousStepOutput,
           "",
-          "Original inquiry (for context):",
+          "Lead transcript:",
           '"""',
           customerMessage,
           '"""',
           "",
-          "Write an internal Markdown summary:",
-          "- H3 'Manual Review Needed'",
-          "- Bullets: risks/ambiguities; what to verify; a suggested call/email script (1–2 lines).",
-          "- Keep under 120 words.",
+          "Write the Markdown nurture note (store in drip_step.md):",
+          "- Friendly opener acknowledging their hesitation.",
+          "- One testimonial or proof point tailored to their blocker.",
+          "- Mention when the crew will check back in and how to reach out sooner.",
         ].join("\n"),
-      dependsOn: ["guardrails-present"],
-      requiredPath: "needs_human",
-      layout: {
-        position: { x: -250, y: 1250 },
-      },
+      dependsOn: ["guardrails-offer"],
+      requiredPath: "hesitant",
+    },
+    "compose-referral-note": {
+      title: "Compose Decline / Referral (disqualify)",
+      description: "Close the loop gracefully and point them to a better-fit solution.",
+      system:
+        "You deliver respectful decline notes for out-of-fit lawn mowing leads. Output Markdown only (no fences).",
+      badges: ["LLM", "CX"],
+      constraints: [
+        "Thank them and clarify the reason for the referral",
+        "Offer vetted alternative or DIY tip",
+        "Invite them to reach out if circumstances change",
+        "Keep under 140 words",
+      ],
+      gradientClass: "from-slate-500 via-slate-600 to-slate-700",
+      promptTemplate: ({ customerMessage, previousStepOutput = "{}" }) =>
+        [
+          "Guardrail decision JSON:",
+          previousStepOutput,
+          "",
+          "Lead transcript for context:",
+          '"""',
+          customerMessage,
+          '"""',
+          "",
+          "Write the Markdown reply (referral.md):",
+          "- Subject line + body",
+          "- Empathetic explanation of the mismatch",
+          "- Provide a referral partner or alternative path",
+          "- Close the loop with future-looking goodwill.",
+        ].join("\n"),
+      dependsOn: ["guardrails-offer"],
+      requiredPath: "disqualify",
     },
   },
 };

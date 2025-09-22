@@ -83,7 +83,7 @@ function ContactForm() {
   return (
     <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-orange-500 rounded-2xl shadow-lg p-6 sm:p-7 pb-6 sm:pb-8 text-white flex flex-col lg:min-h-[800px]">
       <div className="flex justify-center mb-6">
-        <Image src="/AIOLogoDarkV3.svg" alt="AI Optimized Logo" width={200} height={80} />
+        <Image src="/AIOLogoDarkV4.svg" alt="AI Optimized Logo" width={200} height={80} />
       </div>
 
       <form className="space-y-4 sm:space-y-6 flex-1 flex flex-col">

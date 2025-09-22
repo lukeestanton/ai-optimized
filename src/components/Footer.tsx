@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Logo and tagline */}
           <div className="lg:col-span-1 space-y-6">
-            <Image src="/AIOLogoDarkV3.svg" alt="AI Optimized Logo" width={200} height={75} />
+            <Image src="/AIOLogoDarkV4.svg" alt="AI Optimized Logo" width={200} height={75} />
             <div className="space-y-4">
               <h3 className="text-2xl font-bold">
                Governed Automation, Proven <span className="text-cyan-300">Results</span>

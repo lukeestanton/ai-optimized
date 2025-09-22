@@ -384,9 +384,9 @@ export default function Header() {
 
           {/* Get Proposal Link */}
           <div className="flex items-center space-x-4">
-            <button className="cursor-pointer bg-white text-orange-400 px-4 py-2 rounded-full font-century-gothic-black text-base font-bold shadow-lg hover:shadow-xl hover:bg-yellow-400 hover:text-blue-800 transform hover:scale-105 transition-all duration-200 border-2 border-yellow-400">
+            <Link href="/" className="cursor-pointer bg-white text-orange-400 px-4 py-2 rounded-full font-century-gothic-black text-base font-bold shadow-lg hover:shadow-xl hover:bg-yellow-400 hover:text-blue-800 transform hover:scale-105 transition-all duration-200 border-2 border-yellow-400">
               GET FREE PROPOSAL
-            </button>
+            </Link>
           </div>
         </div>
       </div>
