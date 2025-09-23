@@ -1,6 +1,5 @@
 "use client";
 
-import ReactMarkdown from "react-markdown";
 import { ChevronDown, Play } from "lucide-react";
 import type { WorkflowStepDefinition } from "@/lib/workflows/types";
 
@@ -211,8 +210,8 @@ export default function StepCard({
                       Running AI step…
                     </div>
                   ) : output ? (
-                    <div className="prose prose-sm max-w-none rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-slate-900">
-                      <ReactMarkdown>{output}</ReactMarkdown>
+                    <div className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-slate-900">
+                      <pre className="whitespace-pre-wrap text-sm">{output}</pre>
                     </div>
                   ) : (
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-500">

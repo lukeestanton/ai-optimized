@@ -1,23 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
-
-// Simple responsive detection for mobile modal behavior
-function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(false);
-  useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
-    onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-  return isDesktop;
-}
 
 export default function HowItWorksSection() {
   const [showModal, setShowModal] = useState(false);
-  useIsDesktop();
 
   // Loom embed configuration (placeholder URL)
   const loomUrl = 'https://www.loom.com/embed/473fad25ebd24b5ea8091503253dfecf?sid=509c34fa-d46d-4ca6-8cda-6625220a261e';

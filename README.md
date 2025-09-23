@@ -19,6 +19,8 @@ AI Optimized – “AI Workflow Implementation for Your Business” – is a Nex
 - **Styling**: Tailwind CSS 4 with global Century Gothic typography and custom scrollbars set in `globals.css`.
 - **Icons & UI**: Lucide icons, React Markdown rendering, and bespoke timeline/step components.
 - **AI Integration**: OpenAI SDK powers the `/api/ai` route used by the demo’s step runner.
+- **API Protection**: An Upstash-backed rate limiter shields `/api/ai` from excessive traffic while remaining serverless-frien
+dly.
 - **Module Resolution**: Path alias `@/*` simplifies imports across `src`.
 
 ## Project Structure
@@ -45,7 +47,11 @@ Use your preferred Node package manager (e.g., `npm install`) to pull the module
 
 ### Set environment variables
 
-Create `.env.local` (or equivalent) and provide an `OPENAI_API_KEY` so the `/api/ai` route can authenticate with OpenAI.
+Create `.env.local` (or equivalent) and provide:
+
+- `OPENAI_API_KEY` so the `/api/ai` route can authenticate with OpenAI.
+- `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for the server-side rate limiter. When omitted, rate limiting is disabled for local development.
+- Optional knobs for tuning limits: `RATE_LIMIT_REQUESTS` (default `20`) and `RATE_LIMIT_WINDOW_MINUTES` (default `1`).
 
 ### Run the development server
 

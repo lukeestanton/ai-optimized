@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import { useCallback, useMemo, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import StepCard from "./components/StepCard";
 import BranchPlaceholder from "./components/BranchPlaceholder";
 import {
@@ -385,7 +384,7 @@ export default function QuoteToOrderAutopilotDemo() {
   const decisionStepOutput = decisionOutput;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-blue-50">
       <Header />
       <main className="mx-auto max-w-6xl space-y-10 px-4 pb-16 pt-10">
         <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -393,10 +392,10 @@ export default function QuoteToOrderAutopilotDemo() {
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-300">
-                  Revenue rescuer
+                  Workflow
                 </p>
                 <h1 className="text-2xl font-semibold">
-                  Lawn Care Revival Playbook
+                  Lawn Care Inquiry-to-Quote Autopilot
                 </h1>
                 <p className="text-sm text-white">
                   Watch the workflow revive a price-sensitive mowing lead—consume the signals, lock pricing, and ship a polished follow-up from one console.
@@ -664,8 +663,8 @@ export default function QuoteToOrderAutopilotDemo() {
                   Generating the final artifact…
                 </div>
               ) : activeBranchStatus === "done" && activeBranchOutput ? (
-                <div className="prose prose-sm max-w-none rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 text-slate-900">
-                  <ReactMarkdown>{activeBranchOutput}</ReactMarkdown>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 text-slate-900">
+                  <pre className="whitespace-pre-wrap text-sm">{activeBranchOutput}</pre>
                 </div>
               ) : guardrailsCompleted ? (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-600">
