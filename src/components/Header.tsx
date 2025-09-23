@@ -39,11 +39,21 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">GETTING STARTED</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/services/consultation" className="text-gray-700 hover:text-blue-600 transition-colors">AI Consultation</Link></li>
-                        <li><Link href="/services/audit" className="text-gray-700 hover:text-blue-600 transition-colors">AI Readiness Audit</Link></li>
-                        <li><Link href="/services/strategy" className="text-gray-700 hover:text-blue-600 transition-colors">AI Strategy Development</Link></li>
-                        <li><Link href="/services/implementation" className="text-gray-700 hover:text-blue-600 transition-colors">AI Implementation</Link></li>
-                        <li><Link href="/services/support" className="text-gray-700 hover:text-blue-600 transition-colors">Ongoing AI Support</Link></li>
+                        <li>
+                          <Link href="/services/diagnostic" className="text-gray-700 hover:text-blue-600 transition-colors">AI Opportunity Diagnostic</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/process-mapping" className="text-gray-700 hover:text-blue-600 transition-colors">Process Mapping Sprint</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/workflow-prototype" className="text-gray-700 hover:text-blue-600 transition-colors">Workflow Prototype (2 weeks)</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/pilot" className="text-gray-700 hover:text-blue-600 transition-colors">Pilot Implementation</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/retainer" className="text-gray-700 hover:text-blue-600 transition-colors">Coaching & Retainer</Link>
+                        </li>
                       </ul>
                     </div>
 
@@ -58,15 +68,25 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">CORE SERVICES</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/services/automation" className="text-gray-700 hover:text-blue-600 transition-colors">Process Automation</Link></li>
-                        <li><Link href="/services/chatbots" className="text-gray-700 hover:text-blue-600 transition-colors">AI Chatbots</Link></li>
-                        <li><Link href="/services/analytics" className="text-gray-700 hover:text-blue-600 transition-colors">AI Analytics</Link></li>
-                        <li><Link href="/services/integration" className="text-gray-700 hover:text-blue-600 transition-colors">System Integration</Link></li>
-                        <li><Link href="/services/custom" className="text-gray-700 hover:text-blue-600 transition-colors">Custom AI Solutions</Link></li>
+                        <li>
+                          <Link href="/services/lead-to-quote" className="text-gray-700 hover:text-blue-600 transition-colors">Lead-to-Quote Autopilots</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/support-copilot" className="text-gray-700 hover:text-blue-600 transition-colors">Support Inbox Copilot</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/ops-automation" className="text-gray-700 hover:text-blue-600 transition-colors">Back-Office Automations</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/knowledge-chat" className="text-gray-700 hover:text-blue-600 transition-colors">Knowledgebase Search & Chat</Link>
+                        </li>
+                        <li>
+                          <Link href="/services/guardrails" className="text-gray-700 hover:text-blue-600 transition-colors">Agent Handoff & Guardrails</Link>
+                        </li>
                       </ul>
                     </div>
 
-                    {/* Column 3: Industries */}
+                    {/* Column 3: Industries*/}
                     <div>
                       <div className="flex items-center mb-4">
                         <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
@@ -77,11 +97,21 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">INDUSTRIES</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/industries/healthcare" className="text-gray-700 hover:text-blue-600 transition-colors">Healthcare</Link></li>
-                        <li><Link href="/industries/finance" className="text-gray-700 hover:text-blue-600 transition-colors">Finance</Link></li>
-                        <li><Link href="/industries/retail" className="text-gray-700 hover:text-blue-600 transition-colors">Retail & E-commerce</Link></li>
-                        <li><Link href="/industries/manufacturing" className="text-gray-700 hover:text-blue-600 transition-colors">Manufacturing</Link></li>
-                        <li><Link href="/industries/real-estate" className="text-gray-700 hover:text-blue-600 transition-colors">Real Estate</Link></li>
+                        <li>
+                          <Link href="/industries/home-services" className="text-gray-700 hover:text-blue-600 transition-colors">Home Services</Link>
+                        </li>
+                        <li>
+                          <Link href="/industries/agencies" className="text-gray-700 hover:text-blue-600 transition-colors">Agencies</Link>
+                        </li>
+                        <li>
+                          <Link href="/industries/clinics" className="text-gray-700 hover:text-blue-600 transition-colors">Clinics & Practices</Link>
+                        </li>
+                        <li>
+                          <Link href="/industries/ecommerce" className="text-gray-700 hover:text-blue-600 transition-colors">E-commerce & Retail</Link>
+                        </li>
+                        <li>
+                          <Link href="/industries/logistics" className="text-gray-700 hover:text-blue-600 transition-colors">Logistics & Trades</Link>
+                        </li>
                       </ul>
                     </div>
 
@@ -106,7 +136,8 @@ export default function Header() {
               </div>
             </div>
 
-            {/* AI STRATEGIES */}
+            {/* AI STRATEGIES */
+            }
             <div className="relative group">
               <button className="flex items-center hover:text-yellow-300 hover:scale-105 transition-all duration-200 font-century-gothic-black text-base cursor-pointer">
                 AI STRATEGIES
@@ -130,11 +161,21 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">STRATEGY TYPES</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/strategies/digital-transformation" className="text-gray-700 hover:text-blue-600 transition-colors">Digital Transformation</Link></li>
-                        <li><Link href="/strategies/automation" className="text-gray-700 hover:text-blue-600 transition-colors">Automation Strategy</Link></li>
-                        <li><Link href="/strategies/data-driven" className="text-gray-700 hover:text-blue-600 transition-colors">Data-Driven Strategy</Link></li>
-                        <li><Link href="/strategies/customer-experience" className="text-gray-700 hover:text-blue-600 transition-colors">Customer Experience</Link></li>
-                        <li><Link href="/strategies/operational" className="text-gray-700 hover:text-blue-600 transition-colors">Operational Excellence</Link></li>
+                        <li>
+                          <Link href="/strategies/workflow-first" className="text-gray-700 hover:text-blue-600 transition-colors">Workflow-First Strategy</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/agentic" className="text-gray-700 hover:text-blue-600 transition-colors">Agentic Automation</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/hitl" className="text-gray-700 hover:text-blue-600 transition-colors">Human-in-the-Loop Design</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/data-readiness" className="text-gray-700 hover:text-blue-600 transition-colors">Data Readiness & RAG</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/vendor-stack" className="text-gray-700 hover:text-blue-600 transition-colors">Vendor Stack & Buy/Build</Link>
+                        </li>
                       </ul>
                     </div>
 
@@ -149,11 +190,21 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">IMPLEMENTATION</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/strategies/roadmap" className="text-gray-700 hover:text-blue-600 transition-colors">AI Roadmap Planning</Link></li>
-                        <li><Link href="/strategies/pilot-programs" className="text-gray-700 hover:text-blue-600 transition-colors">Pilot Programs</Link></li>
-                        <li><Link href="/strategies/scaling" className="text-gray-700 hover:text-blue-600 transition-colors">Scaling AI Solutions</Link></li>
-                        <li><Link href="/strategies/change-management" className="text-gray-700 hover:text-blue-600 transition-colors">Change Management</Link></li>
-                        <li><Link href="/strategies/roi" className="text-gray-700 hover:text-blue-600 transition-colors">ROI Optimization</Link></li>
+                        <li>
+                          <Link href="/strategies/architecture" className="text-gray-700 hover:text-blue-600 transition-colors">Technical Architecture</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/integrations" className="text-gray-700 hover:text-blue-600 transition-colors">Integrations & Tools</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/evaluation" className="text-gray-700 hover:text-blue-600 transition-colors">Evaluation & QA</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/rollout" className="text-gray-700 hover:text-blue-600 transition-colors">Rollout & Change Mgmt</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/roi-measurement" className="text-gray-700 hover:text-blue-600 transition-colors">ROI Measurement</Link>
+                        </li>
                       </ul>
                     </div>
 
@@ -168,11 +219,21 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">BEST PRACTICES</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/strategies/ethics" className="text-gray-700 hover:text-blue-600 transition-colors">AI Ethics & Governance</Link></li>
-                        <li><Link href="/strategies/security" className="text-gray-700 hover:text-blue-600 transition-colors">AI Security</Link></li>
-                        <li><Link href="/strategies/team-building" className="text-gray-700 hover:text-blue-600 transition-colors">AI Team Building</Link></li>
-                        <li><Link href="/strategies/training" className="text-gray-700 hover:text-blue-600 transition-colors">Staff Training</Link></li>
-                        <li><Link href="/strategies/compliance" className="text-gray-700 hover:text-blue-600 transition-colors">Compliance & Risk</Link></li>
+                        <li>
+                          <Link href="/strategies/prompt-standards" className="text-gray-700 hover:text-blue-600 transition-colors">Prompt Standards & Versioning</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/security" className="text-gray-700 hover:text-blue-600 transition-colors">Security & PII Handling</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/compliance" className="text-gray-700 hover:text-blue-600 transition-colors">Compliance & Audit Trails</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/incident-response" className="text-gray-700 hover:text-blue-600 transition-colors">Incident Response for AI</Link>
+                        </li>
+                        <li>
+                          <Link href="/strategies/team-enablement" className="text-gray-700 hover:text-blue-600 transition-colors">Team Enablement</Link>
+                        </li>
                       </ul>
                     </div>
 
@@ -291,7 +352,6 @@ export default function Header() {
             {/* AI WORKFLOWS */}
             <div className="relative group">
               <button className="flex items-center hover:text-yellow-300 hover:scale-105 transition-all duration-200 font-century-gothic-black text-base cursor-pointer">
-                <span className="text-yellow-500 mr-1"> NEW!</span>
                 AI WORKFLOWS
                 <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -313,11 +373,21 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">LIVE DEMOS</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/demo" className="text-gray-700 hover:text-blue-600 transition-colors">Quote to Order Demo</Link></li>
-                        <li><Link href="/workflows/customer-service" className="text-gray-700 hover:text-blue-600 transition-colors">Customer Service Bot</Link></li>
-                        <li><Link href="/workflows/sales-automation" className="text-gray-700 hover:text-blue-600 transition-colors">Sales Automation</Link></li>
-                        <li><Link href="/workflows/data-processing" className="text-gray-700 hover:text-blue-600 transition-colors">Data Processing</Link></li>
-                        <li><Link href="/workflows/content-generation" className="text-gray-700 hover:text-blue-600 transition-colors">Content Generation</Link></li>
+                        <li>
+                          <Link href="/workflows/revenue-rescuer-demo" className="text-gray-700 hover:text-blue-600 transition-colors">Revenue Rescuer (Lawn)</Link>
+                        </li>
+                        <li>
+                          <Link href="/workflows/claims-triage-demo" className="text-gray-700 hover:text-blue-600 transition-colors">Claims Intake Triage</Link>
+                        </li>
+                        <li>
+                          <Link href="/workflows/subcontractor-compliance-demo" className="text-gray-700 hover:text-blue-600 transition-colors">Subcontractor Compliance</Link>
+                        </li>
+                        <li>
+                          <Link href="/workflows/evidence-intake-demo" className="text-gray-700 hover:text-blue-600 transition-colors">Evidence Intake</Link>
+                        </li>
+                        <li>
+                          <Link href="/workflows/inquiry-to-quote-demo" className="text-gray-700 hover:text-blue-600 transition-colors">Inquiry-to-Quote</Link>
+                        </li>
                       </ul>
                     </div>
 
@@ -332,15 +402,15 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">WORKFLOW TYPES</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/workflows/approval" className="text-gray-700 hover:text-blue-600 transition-colors">Approval Workflows</Link></li>
-                        <li><Link href="/workflows/notification" className="text-gray-700 hover:text-blue-600 transition-colors">Notification Systems</Link></li>
-                        <li><Link href="/workflows/integration" className="text-gray-700 hover:text-blue-600 transition-colors">System Integration</Link></li>
-                        <li><Link href="/workflows/decision" className="text-gray-700 hover:text-blue-600 transition-colors">Decision Trees</Link></li>
-                        <li><Link href="/workflows/escalation" className="text-gray-700 hover:text-blue-600 transition-colors">Escalation Paths</Link></li>
+                        <li><Link href="/workflows/revenue" className="text-gray-700 hover:text-blue-600 transition-colors">Revenue & Upsell Loops</Link></li>
+                        <li><Link href="/workflows/support" className="text-gray-700 hover:text-blue-600 transition-colors">Support & CX</Link></li>
+                        <li><Link href="/workflows/ops" className="text-gray-700 hover:text-blue-600 transition-colors">Ops & Back-Office</Link></li>
+                        <li><Link href="/workflows/sales" className="text-gray-700 hover:text-blue-600 transition-colors">Sales & Outreach</Link></li>
+                        <li><Link href="/workflows/data" className="text-gray-700 hover:text-blue-600 transition-colors">Data & ETL Summaries</Link></li>
                       </ul>
                     </div>
 
-                    {/* Column 3: Implementation */}
+                    {/* Column 3: Implementation (Workflow Anatomy) */}
                     <div>
                       <div className="flex items-center mb-4">
                         <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
@@ -351,11 +421,11 @@ export default function Header() {
                         <h3 className="font-bold text-gray-900 text-sm uppercase">IMPLEMENTATION</h3>
                       </div>
                       <ul className="space-y-3">
-                        <li><Link href="/workflows/design" className="text-gray-700 hover:text-blue-600 transition-colors">Workflow Design</Link></li>
-                        <li><Link href="/workflows/testing" className="text-gray-700 hover:text-blue-600 transition-colors">Testing & QA</Link></li>
-                        <li><Link href="/workflows/deployment" className="text-gray-700 hover:text-blue-600 transition-colors">Deployment</Link></li>
-                        <li><Link href="/workflows/monitoring" className="text-gray-700 hover:text-blue-600 transition-colors">Monitoring & Analytics</Link></li>
-                        <li><Link href="/workflows/optimization" className="text-gray-700 hover:text-blue-600 transition-colors">Optimization</Link></li>
+                        <li><Link href="/workflows/guardrails" className="text-gray-700 hover:text-blue-600 transition-colors">Guardrails Library</Link></li>
+                        <li><Link href="/workflows/tooling" className="text-gray-700 hover:text-blue-600 transition-colors">Tools & Agent Connectors</Link></li>
+                        <li><Link href="/workflows/orchestrator" className="text-gray-700 hover:text-blue-600 transition-colors">Branching Orchestrator</Link></li>
+                        <li><Link href="/workflows/human-review" className="text-gray-700 hover:text-blue-600 transition-colors">Human Review Console</Link></li>
+                        <li><Link href="/workflows/analytics" className="text-gray-700 hover:text-blue-600 transition-colors">Analytics & A/B Tests</Link></li>
                       </ul>
                     </div>
 
