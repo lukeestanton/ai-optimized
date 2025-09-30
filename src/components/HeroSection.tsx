@@ -5,11 +5,10 @@ import { useState, useEffect } from 'react';
 export default function HeroSection() {
   return (
     <>
-      {/* Top section with blue-tinted background */}
       <section className="bg-blue-50 py-12 lg:py-16 pb-16 lg:pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Left side content */}
+            {/* Left side */}
             <div className="space-y-8">
               <div className="space-y-6">
                 <h1 className="text-3xl lg:text-5xl font-bold text-gray-900 leading-tight font-century-gothic-black uppercase">
@@ -68,7 +67,7 @@ export default function HeroSection() {
               
             </div>
 
-            {/* Right side - Contact Form */}
+            {/* Right */}
             <div className="lg:ml-8 mt-8 lg:mt-0">
               <ContactForm />
             </div>
@@ -132,7 +131,7 @@ function ContactForm() {
           <label className="block text-base font-medium mb-2">Comments or Questions</label>
           <textarea
             rows={4}
-            placeholder="Anything else we should know?"
+            placeholder="What's your business's biggest bottleneck?"
             className="w-full px-5 py-4 rounded-lg bg-white text-gray-900 placeholder-gray-500 border-0 focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none text-base flex-1 min-h-[100px] lg:min-h-[200px]"
           />
         </div>
@@ -193,7 +192,7 @@ function ReviewsCarousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentReview((prev) => (prev + 1) % reviews.length);
-    }, 4000); // Change review every 4 seconds
+    }, 4000); // Swap: 4 secs
 
     return () => clearInterval(interval);
   }, [reviews.length]);

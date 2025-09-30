@@ -1,5 +1,3 @@
-// Original complex types backed up in ./backup/types.ts
-
 export type WorkflowPromptContext = {
   customerMessage: string;
   previousStepOutput?: string;

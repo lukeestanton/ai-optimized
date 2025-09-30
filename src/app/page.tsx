@@ -1,4 +1,4 @@
-import Header from '@/components/Header';
+import HeaderLegacy from '@/components/HeaderLegacy';
 import HeroSection from '@/components/HeroSection';
 import PilotTimelineSection from '@/components/PilotTimelineSection';
 import HowItWorksSection from '@/components/HowItWorksSection';
@@ -6,14 +6,15 @@ import AIWorkflowsSection from '@/components/AIWorkflowsSection';
 import AboutSection from '@/components/AboutSection';
 import Footer from '@/components/Footer';
 
+// Maybe replace timeline with diff section
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <HeaderLegacy />
       <main>
         <HeroSection />
         <HowItWorksSection />
-        <PilotTimelineSection />
+        {false && <PilotTimelineSection />}
         <AIWorkflowsSection />
         <AboutSection />
       </main>

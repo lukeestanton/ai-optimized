@@ -5,7 +5,7 @@ export default function AboutSection() {
     <section className="bg-blue-50 py-10 lg:py-15">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left side - Team image */}
+          {/* Left side - Placeholder. MAKE ACTUAL PIC */}
           <div className="relative">
             <div className="rounded-3xl overflow-hidden shadow-lg">
               <Image 
@@ -27,8 +27,8 @@ export default function AboutSection() {
               <p>
                 AI Optimized is a team of software engineers, AI researchers, and marketing 
                 experts who design, build, and maintain AI workflows your team actually uses. 
-                We plug modern AI into the work that moves your business—support, sales, knowledge 
-                upkeep, and back-office ops—so handoffs get faster, bottlenecks shrink, and 
+                We plug modern AI into the work that moves your business: support, sales, knowledge 
+                upkeep, and back-office ops, so handoffs get faster, bottlenecks shrink, and 
                 outcomes are measurable in hours saved, response times, and conversion lift.
               </p>
               <p>
@@ -36,7 +36,7 @@ export default function AboutSection() {
                 playbook. We take the time to learn your processes, tools, compliance needs, and success 
                 metrics, then map a clear workflow, pilot it quickly (often within 14 days), and improve 
                 it with human-in-the-loop controls, security you can explain, and a monthly tuning 
-                cadence—so you reach your goals with reliable, repeatable workflows.
+                cadence, so you reach your goals with reliable, repeatable workflows.
               </p>
             </div>
           </div>

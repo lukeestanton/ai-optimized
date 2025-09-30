@@ -1,6 +1,7 @@
+// Demo test just for loom. Remove later.
 "use client";
 
-import Header from "@/components/Header";
+import Header from "@/components/HeaderLegacy";
 import { useCallback, useMemo, useState } from "react";
 import StepCard from "./components/StepCard";
 import BranchPlaceholder from "./components/BranchPlaceholder";
@@ -18,7 +19,6 @@ import {
 } from "lucide-react";
 import {
   inquiryToQuoteWorkflow,
-  MARGIN_FLOOR_PCT,
 } from "@/lib/workflows/inquiryToQuote";
 import type { WorkflowStepDefinition } from "@/lib/workflows/types";
 
@@ -95,8 +95,6 @@ const GRAPH_SPEC: GraphNode[] = [
   },
 ];
 
-// STATUS_LABELS and STATUS_STYLES moved into StepCard component
-
 const PATH_LABELS: Record<BranchPath, string> = {
   buy_now: "Buy-now recovery",
   value: "Value reassurance",
@@ -120,8 +118,6 @@ type GuardrailsDecision = {
   adjustments?: Array<{ tier?: string; action?: string; note?: string; amount?: number | null }>;
 };
 
-// StepCard and BranchPlaceholder moved to ./components
-
 export default function QuoteToOrderAutopilotDemo() {
   const workflow = inquiryToQuoteWorkflow;
   const decisionStepId = workflow.branchDecisionStepId;
@@ -135,7 +131,7 @@ export default function QuoteToOrderAutopilotDemo() {
   const [intakeOpen, setIntakeOpen] = useState(true);
 
   const [customerMessage, setCustomerMessage] = useState<string>(
-    "Hey there — this is Marcus from 18 Cedar Brook. You sent over a mowing plan in April but we never booked. The lawn is looking rough again, the backyard slope is overgrown, and we'd like it sorted before the neighborhood block party in two weeks. Another company dangled $65/week if we lock in bi-weekly service. Could you match that or give us a reason to stay with you?"
+    "Hey there, this is Marcus from 18 Cedar Brook. You sent over a mowing plan in April but we never booked. The lawn is looking rough again, the backyard slope is overgrown, and we'd like it sorted before the neighborhood block party in two weeks. Another company dangled $65/week if we lock in bi-weekly service. Could you match that or give us a reason to stay with you?"
   );
 
   const [stepStatus, setStepStatus] = useState<Record<string, RunState>>({});
@@ -398,7 +394,7 @@ export default function QuoteToOrderAutopilotDemo() {
                   Lawn Care Inquiry-to-Quote Autopilot
                 </h1>
                 <p className="text-sm text-white">
-                  Watch the workflow revive a price-sensitive mowing lead—consume the signals, lock pricing, and ship a polished follow-up from one console.
+                  Watch the workflow revive a price-sensitive mowing lead: consume the signals, lock pricing, and ship a polished follow-up from one console.
                 </p>
               </div>
             {/* Buttons removed per request; controls remain in the timeline section below */}
@@ -535,7 +531,7 @@ export default function QuoteToOrderAutopilotDemo() {
               <div className="mt-4 space-y-3 text-sm text-slate-600">
                 <div className="flex items-center justify-between">
                   <span>Margin floor</span>
-                  <span className="font-semibold text-slate-900">{MARGIN_FLOOR_PCT}%</span>
+                  <span className="font-semibold text-slate-900">%</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Decision path</span>
