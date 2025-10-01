@@ -1,6 +1,6 @@
 ## AI Optimized
 
-AI Optimized – “AI Workflow Implementation for Your Business” – is a Next.js 15 + React 19 application that pairs a multi-section marketing site with an interactive quote-to-order automation demo to showcase guardrailed AI workflows.
+AI Optimized – “AI Workflow Implementation for Your Business” – is a Next.js 15 + React 19 application that pairs a multi-section marketing site with an interactive inquiry-to-quote automation demo for demo video to showcase guardrailed AI workflows.
 
 ## Highlights
 

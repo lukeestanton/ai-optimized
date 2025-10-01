@@ -4,7 +4,6 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-br from-blue-700 via-blue-600 to-orange-600 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Main footer content */}
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Logo and tagline */}
           <div className="lg:col-span-1 space-y-6">

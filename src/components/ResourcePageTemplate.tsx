@@ -110,7 +110,7 @@ export type ResourcePageContent = {
   breadcrumbs?: ResourceBreadcrumb[];
   enableToc?: boolean;
   enableSearch?: boolean;
-  jsonLd?: Record<string, any>;
+  jsonLd?: Record<string, unknown>;
 };
 
 // UI Constants
@@ -240,7 +240,6 @@ export default function ResourcePageTemplate({ content }: { content: ResourcePag
       {jsonLd && (
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: jsonLd }}
         />
       )}

@@ -6,7 +6,7 @@ import Image from 'next/image';
 export default function HowItWorksSection() {
   const [showModal, setShowModal] = useState(false);
 
-  // Loom embed configuration (placeholder URL)
+  // Placeholder for now. RECORD VID
   const loomUrl = 'https://www.loom.com/embed/473fad25ebd24b5ea8091503253dfecf?sid=509c34fa-d46d-4ca6-8cda-6625220a261e';
 
   return (
